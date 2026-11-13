@@ -161,14 +161,14 @@ nav button.on{color:#fff;box-shadow:inset 0 -3px 0 #e6c27a}
   <p>Responsable de traitement : l’association M2M – Musulman(e)s de Meudon, représentée par son Président. La gestion opérationnelle des dossiers est assurée par la Secrétaire de l’association, avec un accès limité aux référents action sociale désignés par le Bureau.</p>
   <p>L’accompagnement proposé par M2M est apporté à toute personne en situation de besoin, sans condition d’appartenance religieuse ni obligation de pratique cultuelle. Le refus de participer à une activité religieuse ou communautaire de l’association n’a aucune incidence sur l’accès à l’aide sollicitée.</p>
   <p>Conformément au RGPD, vous disposez notamment de droits d’accès, de rectification, d’effacement, de limitation et, selon la base légale applicable, d’opposition ou de retrait du consentement. Vous pouvez les exercer auprès du Secrétariat : corresp.m2m@gmail.com.</p></details></div>
-  <div class="card"><small class="m">Version <span id="ver"></span></small></div>
+  <div class="card"><small class="m">Version <span id="ver"></span> · <a href="#" id="b_open">Accès Bureau</a></small></div>
 </section>
 </main>
 
 <div id="rg"><div><h2>Bienvenue</h2><p>Cette application ne vous suit pas et ne collecte rien automatiquement.</p><p>Si vous déposez un dossier dans l’Espace bénéficiaire, vos informations et documents ne sont accessibles qu’au <b>Bureau</b> et aux <b>référents action sociale</b> de M2M. Votre accord vous sera demandé avant tout envoi.</p><button class="btn" id="rgok">J’ai compris</button></div></div>
 <script src="config.js"></script>
 <script>
-const APP_VERSION="7";   // à changer aussi dans version.json
+const APP_VERSION="8";   // à changer aussi dans version.json
 document.getElementById('ver').textContent=APP_VERSION;document.getElementById('vv').textContent=APP_VERSION;
 const go=t=>document.querySelector('nav [data-t="'+t+'"]').click();
 try{if(!localStorage.getItem('m2m_info'))document.getElementById('rg').style.display='flex'}catch(e){}
@@ -337,9 +337,9 @@ $('s_send').onclick=async()=>{
   }catch(e){m.className='er';m.textContent='Échec de l’envoi.'}
 };
 // ----- Espace Bureau : 5 appuis sur le logo, puis mot de passe -----
-let ROWS=[],tp=0;
+let ROWS=[],tp=0,LOGGED=false;
 function bureauUI(ok){$('navb').style.display='';$('b_login').style.display=ok?'none':'block';$('b_app').style.display=ok?'block':'none'}
-async function loadB(){const r=await api({action:'list',pwd:pwd()});if(!r.ok)return false;ROWS=r.rows;drawB();return true}
+async function loadB(){const r=await api({action:'list',pwd:pwd()});if(!r.ok)return false;LOGGED=true;ROWS=r.rows;drawB();return true}
 function drawB(){
   const q=norm($('b_q').value);
   $('b_list').innerHTML=ROWS.filter(x=>!q||norm(x.code+' '+x.nom+' '+x.prenom).includes(q)).map(x=>`<a class="nw" href="#" data-c="${esc(x.code)}"><b>${esc(x.code)} – ${esc(x.nom)} ${esc(x.prenom)}</b><small>${esc(x.statut)}${x.manquant?' · manque : '+esc(x.manquant):''}</small></a>`).join('')||'<small class="m">Aucun dossier.</small>';
@@ -358,7 +358,8 @@ function det(c){
   <button class="btn" id="u_go">Enregistrer</button><small id="u_m"></small></div>`;
   $('u_go').onclick=async()=>{const r=await api({action:'update',pwd:pwd(),code:c,statut:$('u_st').value,message:$('u_msg').value,creneau:$('u_cr').value});$('u_m').textContent=r.ok?'Enregistré.':'Échec.';if(r.ok)loadB()};
 }
-document.querySelector('header img').onclick=()=>{if(SCRIPT_URL&&++tp>=5){tp=0;bureauUI(false);go('bureau')}};
+document.querySelector('header img').onclick=()=>{if(SCRIPT_URL&&++tp>=5){tp=0;bureauUI(LOGGED);go('bureau')}};
+$('b_open').onclick=e=>{e.preventDefault();if(SCRIPT_URL){bureauUI(LOGGED);go('bureau')}};
 $('b_go').onclick=async()=>{try{localStorage.setItem('m2m_pwd',$('b_pwd').value)}catch(e){}
   if(await loadB())bureauUI(true);else{$('b_err').textContent='Mot de passe incorrect.';try{localStorage.removeItem('m2m_pwd')}catch(e){}}};
 $('b_q').oninput=drawB;
