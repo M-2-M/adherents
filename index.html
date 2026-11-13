@@ -15,13 +15,13 @@
 body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:70px}
 header{background:#2f5d2b;color:#fff;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top,0px))}
 header{display:flex;align-items:center;gap:12px}header img{width:52px;height:52px;background:#fff;border-radius:50%;padding:3px}header b{font-size:18px}header small{display:block;color:#e6c27a}
-#upd{display:none;background:var(--o);color:#fff;padding:10px 16px;text-align:center;font-weight:600}
+#upd{display:none;position:sticky;top:0;z-index:60;background:var(--o);color:#fff;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));text-align:center;font-weight:700}
 #upd button{margin-left:8px;border:0;border-radius:6px;padding:6px 10px;font-weight:700}
 main{max-width:640px;margin:auto;padding:14px}
 section{display:none}section.on{display:block}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
 h2{margin:0 0 8px;font-size:18px;color:var(--g)}
-.pt{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .pt div{text-align:center;background:var(--bg);border-radius:8px;padding:8px 2px}
 .pt span{display:block;font-size:12px;color:var(--mu)}.pt b{font-size:17px}
 .btn{display:block;width:100%;text-align:center;padding:13px;margin:8px 0;border-radius:10px;background:var(--g);color:#fff;text-decoration:none;font-weight:600;border:0;font-size:16px}
@@ -34,6 +34,10 @@ input[type=text],input[type=tel],input[type=email],input[type=date],input[type=n
 label.l{font-size:14px;font-weight:600;display:block}details>summary{font-weight:700;color:var(--g);font-size:17px;cursor:pointer}
 .ok{background:#e6f2e4;color:#1d4a1a;padding:10px;border-radius:8px;margin:8px 0}.er{color:#b00020}
 .hp{position:absolute;left:-9999px}
+.pt .nx{outline:3px solid var(--o)}.pt .now{background:var(--g)}.pt .now span,.pt .now b{color:#fff}
+.nw{display:block;padding:9px 0;border-bottom:1px solid var(--bd);color:var(--tx);text-decoration:none}.nw small{display:block;color:var(--mu)}
+.bc{display:flex;gap:12px;align-items:center;margin:8px 0}.bc img,.bc i{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--bd);flex:none}.bc small{display:block;color:var(--mu)}
+#rg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}#rg>div{background:var(--card);border-radius:14px;padding:20px;max-width:420px}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
 nav button{flex:1;padding:12px 4px;border:0;background:none;color:var(--mu);font-size:13px;font-weight:600}
 nav button.on{color:var(--g);border-top:3px solid var(--o)}
@@ -41,35 +45,43 @@ nav button.on{color:var(--g);border-top:3px solid var(--o)}
 </head>
 <body>
 <div id="upd">Nouvelle version disponible <button id="updBtn">Mettre à jour</button></div>
-<header><img src="logo.png" alt="Logo M2M"><div><b>M2M – Musulman(e)s de Meudon</b><small>Application des adhérents et bénéficiaires</small></div></header>
+<header><img src="logo.png" alt="Logo M2M"><div><b>M2M – Musulman(e)s de Meudon</b><small>Application M2M · V<span id="vv"></span></small></div></header>
 <main>
 
 <section id="home" class="on">
   <div class="card">
     <h2>Horaires de prière</h2>
-    <small class="m" id="src">Source : Centre Musulman de Clamart (MAWAQIT)</small>
-    <div class="pt" id="pt" style="margin-top:10px"></div>
+    <small class="m">Source : Centre Musulman de Clamart (MAWAQIT)</small>
+    <div id="nextp" class="ok" style="margin-top:10px"></div>
+    <div class="pt" id="pt"></div>
+    <p id="juma" style="margin:10px 0 0"></p>
     <small class="m" id="ptdate"></small>
     <a class="btn l" href="https://mawaqit.net/fr/mon-domicile-clamart-tv" target="_blank" rel="noopener">Ouvrir MAWAQIT (référence)</a>
   </div>
   <div class="card">
     <h2>Nous rejoindre</h2>
+    <button class="btn" onclick="go('aide')">Devenir bénéficiaire</button>
     <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScTrTaS3nuxaLDtArAqDBiTIY20giBxfJ0IpMZ-XXJFzG0L2w/viewform" target="_blank" rel="noopener">Adhérer (gratuit) / groupe WhatsApp</a>
     <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSftDlr-0xYNRuu2zcd65e6YXlyKoI5mgEoMa9U4FbazW8i1BA/viewform" target="_blank" rel="noopener">Devenir bénévole</a>
     <a class="btn o" href="https://pay.sumup.com/b2c/Q65O3I0I" target="_blank" rel="noopener">Faire un don</a>
   </div>
   <div class="card">
-    <h2>Suivre M2M</h2>
-    <a class="btn l" href="https://m2m-meudon.fr/index.php/actualites/" target="_blank" rel="noopener">Actualités du site</a>
+    <h2>Actualités</h2>
+    <div id="news"><small class="m">Chargement…</small></div>
+    <a class="btn l" href="https://m2m-meudon.fr/index.php/actualites/" target="_blank" rel="noopener">Toutes les actualités</a>
     <a class="btn l" href="https://www.facebook.com/share/168wRVbdU3/" target="_blank" rel="noopener">Page Facebook</a>
+  </div>
+  <div class="card" id="gazc">
+    <h2>La Gazette M2M</h2>
+    <div id="gaz"></div>
   </div>
 </section>
 
 <section id="aide">
   <div class="card">
-    <h2>Demande d’aide (colis, kits scolaires…)</h2>
-    <p>M2M aide toute personne en situation de besoin, sans condition religieuse. Voici les documents à rassembler pour constituer votre dossier. Cochez ceux que vous avez déjà : la liste reste sur votre téléphone.</p>
-    <small class="m">Vos données ne sont accessibles qu’au Bureau et aux référents action sociale (RGPD).</small>
+    <h2>Espace bénéficiaire</h2>
+    <p>M2M aide toute personne en situation de besoin (colis alimentaires, kits scolaires…), sans condition religieuse. Rassemblez les documents ci-dessous, puis déposez votre dossier en ligne ou apportez-le à la permanence.</p>
+    <div class="ok"><b>Vos données</b> : elles ne sont accessibles qu’au Bureau et aux référents action sociale de M2M. Votre accord (RGPD) vous est demandé avant tout envoi.</div>
   </div>
   <div class="card">
     <h2>Documents à fournir</h2>
@@ -129,19 +141,24 @@ nav button.on{color:var(--g);border-top:3px solid var(--o)}
     <a class="btn l" href="https://m2m-meudon.fr/index.php/politique-confidentialite/" target="_blank" rel="noopener">Politique de confidentialité</a>
     <a class="btn l" href="https://m2m-meudon.fr" target="_blank" rel="noopener">Site m2m-meudon.fr</a>
   </div>
+  <div class="card" id="bur" style="display:none"><h2>Le Bureau</h2><div id="burl"></div><h2 style="margin-top:14px">Conseil d’administration</h2><div id="cal"></div></div>
   <div class="card"><small class="m">Version <span id="ver"></span></small></div>
 </section>
 </main>
 
 <nav>
   <button data-t="home" class="on">Accueil</button>
-  <button data-t="aide">Demande d’aide</button>
+  <button data-t="aide">Espace bénéficiaire</button>
   <button data-t="infos">Infos</button>
 </nav>
 
+<div id="rg"><div><h2>Bienvenue</h2><p>Cette application ne vous suit pas et ne collecte rien automatiquement.</p><p>Si vous déposez un dossier dans l’Espace bénéficiaire, vos informations et documents ne sont accessibles qu’au <b>Bureau</b> et aux <b>référents action sociale</b> de M2M. Votre accord vous sera demandé avant tout envoi.</p><button class="btn" id="rgok">J’ai compris</button></div></div>
 <script>
-const VERSION="1.1.0";
-document.getElementById('ver').textContent=VERSION;
+const APP_VERSION="4";   // à changer aussi dans version.json
+document.getElementById('ver').textContent=APP_VERSION;document.getElementById('vv').textContent=APP_VERSION;
+const go=t=>document.querySelector('nav [data-t="'+t+'"]').click();
+try{if(!localStorage.getItem('m2m_info'))document.getElementById('rg').style.display='flex'}catch(e){}
+document.getElementById('rgok').onclick=()=>{document.getElementById('rg').style.display='none';try{localStorage.setItem('m2m_info','1')}catch(e){}};
 // Lien du formulaire bénéficiaire (à renseigner quand il existe)
 const FORM_BENEF="";
 if(FORM_BENEF){const a=document.getElementById('formlink');a.href=FORM_BENEF;a.style.display='block'}
@@ -151,13 +168,42 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');document.getElementById(b.dataset.t).classList.add('on');scrollTo(0,0)});
 
-// Horaires (horaires.json, mis à jour automatiquement côté GitHub)
-const NOMS={fajr:'Fajr',chourouk:'Chourouk',dhuhr:'Dhuhr',asr:'Asr',maghrib:'Maghrib',isha:'Isha',jumua1:'Joumou’a 1',jumua2:'Joumou’a 2'};
+// Horaires : horaires.json (mis à jour chaque jour par GitHub Actions depuis MAWAQIT)
+const NOMS=[['fajr','Fajr'],['chourouk','Chourouk'],['dhuhr','Dhuhr'],['asr','Asr'],['maghrib','Maghrib'],['isha','Isha']];
+let PT=null;const mn=t=>{const p=t.split(':');return +p[0]*60+ +p[1]};
+function drawPT(){
+  if(!PT)return;const d=new Date(),n=d.getHours()*60+d.getMinutes();let nx=-1;
+  NOMS.forEach(([k],i)=>{if(nx<0&&k!=='chourouk'&&mn(PT[k])>n)nx=i});
+  document.getElementById('pt').innerHTML=NOMS.map(([k,l],i)=>{const t=mn(PT[k]);const c=i===nx?'nx':(k!=='chourouk'&&n>=t&&n<t+30?'now':'');return `<div class="${c}"><span>${l}</span><b>${PT[k]}</b></div>`}).join('');
+  const el=document.getElementById('nextp');
+  if(nx>=0){const m=mn(PT[NOMS[nx][0]])-n;el.textContent='Prochaine prière : '+NOMS[nx][1]+' à '+PT[NOMS[nx][0]]+' (dans '+(m>=60?Math.floor(m/60)+' h ':'')+(m%60)+' min)'}
+  else el.textContent='Prochaine prière : Fajr demain';
+  document.getElementById('juma').innerHTML=PT.jumua1?'<b>Joumou’a</b> : '+PT.jumua1+(PT.jumua2?' et '+PT.jumua2:''):'';
+}
 fetch('horaires.json',{cache:'no-cache'}).then(r=>r.json()).then(d=>{
-  const pt=document.getElementById('pt');
-  pt.innerHTML=Object.keys(NOMS).filter(k=>d[k]).map(k=>`<div><span>${NOMS[k]}</span><b>${d[k]}</b></div>`).join('');
-  document.getElementById('ptdate').textContent='Mis à jour le '+d.maj+'. MAWAQIT reste la référence.';
-}).catch(()=>{document.getElementById('pt').textContent='Horaires indisponibles hors ligne.'});
+  PT=d;drawPT();setInterval(drawPT,30000);
+  let t='Mis à jour le '+d.maj+'. MAWAQIT reste la référence.';
+  if(d.iso&&(Date.now()-new Date(d.iso).getTime())>3*864e5)t='⚠ Horaires peut-être non à jour : consultez MAWAQIT. ('+d.maj+')';
+  document.getElementById('ptdate').textContent=t;
+}).catch(()=>{document.getElementById('nextp').textContent='Horaires indisponibles hors ligne.'});
+
+// Actualités du site (WordPress), Gazette et Bureau
+fetch('https://m2m-meudon.fr/?rest_route=/wp/v2/posts&per_page=4&_fields=title,link,date').then(r=>r.json()).then(p=>{
+  const n=document.getElementById('news');n.textContent='';
+  p.forEach(x=>{const a=document.createElement('a');a.className='nw';a.href=x.link;a.target='_blank';a.rel='noopener';
+    const b=document.createElement('b');b.innerHTML=x.title.rendered;const s=document.createElement('small');s.textContent=new Date(x.date).toLocaleDateString('fr-FR');a.append(b,s);n.append(a)});
+}).catch(()=>{document.getElementById('news').innerHTML='<small class="m">Actualités à lire sur le site.</small>'});
+fetch('gazettes.json',{cache:'no-cache'}).then(r=>r.json()).then(g=>{
+  const el=document.getElementById('gaz');
+  if(!g.length){el.innerHTML='<small class="m">Prochaine gazette bientôt.</small>';return}
+  el.innerHTML=g.map(x=>`<a class="nw" href="gazettes/${encodeURIComponent(x.fichier)}" target="_blank" rel="noopener"><b>${x.titre}</b><small>${x.date||''}</small></a>`).join('');
+}).catch(()=>{});
+fetch('bureau.json',{cache:'no-cache'}).then(r=>r.json()).then(b=>{
+  const m=(b.bureau||[]).filter(x=>x.nom);if(!m.length&&!(b.ca||[]).length)return;
+  document.getElementById('bur').style.display='block';
+  document.getElementById('burl').innerHTML=m.map(x=>`<div class="bc">${x.photo?`<img src="photos/${encodeURIComponent(x.photo)}" alt="">`:'<i></i>'}<div><b>${x.nom}</b><small>${x.role}</small></div></div>`).join('');
+  document.getElementById('cal').textContent=(b.ca||[]).join(' · ');
+}).catch(()=>{});
 
 // Liste des pièces (cases cochées gardées en local sur le téléphone)
 const PIECES=[
@@ -181,7 +227,7 @@ document.getElementById('wipe').onclick=()=>{
 
 // ===== Dépôt de dossier et suivi (Google Apps Script) =====
 const SCRIPT_URL="";            // URL « Application Web » du script Google (voir instructions)
-const RETENTION="à définir par le Bureau";
+const RETENTION="2 ans après la dernière aide ou le dernier contact, puis suppression";
 document.getElementById('ret').textContent=RETENTION;
 if(!SCRIPT_URL)document.querySelectorAll('details').forEach(d=>d.closest('.card').style.display='none');
 const $=i=>document.getElementById(i);
@@ -230,18 +276,17 @@ async function suivi(){
 }
 $('s_go').onclick=suivi;
 
-// Mise à jour : bandeau quand une nouvelle version est prête
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').then(reg=>{
-    const show=w=>{const u=document.getElementById('upd');u.style.display='block';
-      document.getElementById('updBtn').onclick=()=>w.postMessage('SKIP_WAITING')};
-    if(reg.waiting&&navigator.serviceWorker.controller)show(reg.waiting);
-    reg.addEventListener('updatefound',()=>{const n=reg.installing;
-      n.addEventListener('statechange',()=>{if(n.state==='installed'&&navigator.serviceWorker.controller)show(n)})});
-    setInterval(()=>reg.update(),30*60*1000);
-  });
-  let r=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!r){r=true;location.reload()}});
+// Mise à jour : on compare la version de cette page à version.json (bandeau en haut)
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+async function chkVer(){
+  try{const j=await (await fetch('version.json?'+Date.now(),{cache:'no-store'})).json();
+    if(String(j.version)!==APP_VERSION){
+      const u=document.getElementById('upd');u.style.display='block';
+      document.getElementById('updBtn').onclick=async()=>{try{for(const k of await caches.keys())await caches.delete(k)}catch(e){}location.reload()};
+    }}catch(e){}
 }
+chkVer();setInterval(chkVer,5*60*1000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')chkVer()});
 </script>
 </body>
 </html>

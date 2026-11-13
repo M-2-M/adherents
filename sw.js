@@ -1,11 +1,9 @@
-// Changer VERSION à chaque déploiement => bandeau « Mettre à jour » chez les utilisateurs
-const VERSION='1.1.0',CACHE='m2m-'+VERSION,SHELL=['./','index.html','manifest.webmanifest','logo.png','icon-192.png','horaires.json'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL))));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>clients.claim())));
-self.addEventListener('message',e=>{if(e.data==='SKIP_WAITING')self.skipWaiting()});
+// Réseau d'abord : l'application est toujours à jour quand il y a du réseau, et marche hors ligne avec la dernière copie.
+const C='m2m';
+self.addEventListener('install',()=>self.skipWaiting());
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>clients.claim())));
 self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET'||new URL(e.request.url).origin!==location.origin)return;
-  if(e.request.url.includes('horaires.json')){
-    e.respondWith(fetch(e.request).then(r=>{const c=r.clone();caches.open(CACHE).then(x=>x.put(e.request,c));return r}).catch(()=>caches.match(e.request)));return}
-  e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+  const r=e.request,u=new URL(r.url);
+  if(r.method!=='GET'||u.origin!==location.origin)return;
+  e.respondWith(fetch(u.href,{cache:'no-store'}).then(x=>{if(x.ok){const c=x.clone();caches.open(C).then(k=>k.put(r,c))}return x}).catch(()=>caches.match(r)));
 });
