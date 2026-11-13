@@ -71,6 +71,11 @@ nav button.on{color:#fff;box-shadow:inset 0 -3px 0 #e6c27a}
     <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSftDlr-0xYNRuu2zcd65e6YXlyKoI5mgEoMa9U4FbazW8i1BA/viewform" target="_blank" rel="noopener">Devenir bénévole</a>
     <a class="btn o" href="https://pay.sumup.com/b2c/Q65O3I0I" target="_blank" rel="noopener">Faire un don</a>
   </div>
+  <div class="card" id="colc" style="display:none">
+    <h2>Collectes à venir</h2>
+    <div id="col"></div>
+    <small class="m">Denrées, produits d’hygiène ou dons : venez nous voir sur place.</small>
+  </div>
   <div class="card">
     <h2>Actualités</h2>
     <div id="news"><small class="m">Chargement…</small></div>
@@ -161,8 +166,9 @@ nav button.on{color:#fff;box-shadow:inset 0 -3px 0 #e6c27a}
 </main>
 
 <div id="rg"><div><h2>Bienvenue</h2><p>Cette application ne vous suit pas et ne collecte rien automatiquement.</p><p>Si vous déposez un dossier dans l’Espace bénéficiaire, vos informations et documents ne sont accessibles qu’au <b>Bureau</b> et aux <b>référents action sociale</b> de M2M. Votre accord vous sera demandé avant tout envoi.</p><button class="btn" id="rgok">J’ai compris</button></div></div>
+<script src="config.js"></script>
 <script>
-const APP_VERSION="5";   // à changer aussi dans version.json
+const APP_VERSION="6";   // à changer aussi dans version.json
 document.getElementById('ver').textContent=APP_VERSION;document.getElementById('vv').textContent=APP_VERSION;
 const go=t=>document.querySelector('nav [data-t="'+t+'"]').click();
 try{if(!localStorage.getItem('m2m_info'))document.getElementById('rg').style.display='flex'}catch(e){}
@@ -206,6 +212,15 @@ fetch('gazettes.json',{cache:'no-cache'}).then(r=>r.json()).then(g=>{
   if(!g.length){el.innerHTML='<small class="m">Prochaine gazette bientôt.</small>';return}
   el.innerHTML=g.map(x=>`<a class="nw" href="gazettes/${encodeURIComponent(x.fichier)}" target="_blank" rel="noopener"><b>${x.titre}</b><small>${x.date||''}</small></a>`).join('');
 }).catch(()=>{});
+fetch('collectes.json',{cache:'no-cache'}).then(r=>r.json()).then(c=>{
+  const d=new Date(),p=n=>String(n).padStart(2,'0'),today=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  const l=c.filter(x=>x.iso>=today).sort((a,b)=>a.iso<b.iso?-1:1);if(!l.length)return;
+  document.getElementById('colc').style.display='block';
+  document.getElementById('col').innerHTML=l.map(x=>{
+    const dt=new Date(x.iso+'T12:00:00'),diff=Math.round((dt-new Date(today+'T12:00:00'))/864e5);
+    const lab=(diff===0?'Aujourd’hui · ':diff===1?'Demain · ':'')+dt.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    return `<div class="nw"><b>${esc(x.type)} – ${esc(lab)}</b><small>${esc(x.lieu)}${x.note?' · '+esc(x.note):''}</small></div>`}).join('');
+}).catch(()=>{});
 fetch('bureau.json',{cache:'no-cache'}).then(r=>r.json()).then(b=>{
   const m=(b.bureau||[]).filter(x=>x.nom);if(!m.length&&!(b.ca||[]).length){document.getElementById('burl').innerHTML='<small class="m">Présentation du Bureau bientôt disponible.</small>';return}
   document.getElementById('bur').style.display='block';
@@ -234,7 +249,6 @@ document.getElementById('wipe').onclick=()=>{
 
 
 // ===== Dépôt de dossier, suivi et espace Bureau (Google Apps Script) =====
-const SCRIPT_URL="";            // URL « Application Web » du script Google
 const RETENTION="2 ans après la dernière aide ou le dernier contact, puis suppression";
 document.getElementById('ret').textContent=RETENTION;document.getElementById('ret2').textContent=RETENTION;
 if(!SCRIPT_URL)document.querySelectorAll('.needs').forEach(x=>x.style.display='none');
