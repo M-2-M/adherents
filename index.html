@@ -174,7 +174,7 @@ nav button.on{color:#fff;box-shadow:inset 0 -3px 0 #e6c27a}
 <div id="rg"><div><h2>Bienvenue</h2><p>Cette application ne vous suit pas et ne collecte rien automatiquement.</p><p>Si vous déposez un dossier dans l’Espace bénéficiaire, vos informations et documents ne sont accessibles qu’au <b>Bureau</b> et aux <b>référents action sociale</b> de M2M. Votre accord vous sera demandé avant tout envoi.</p><button class="btn" id="rgok">J’ai compris</button></div></div>
 <script src="config.js"></script>
 <script>
-const APP_VERSION="9";   // à changer aussi dans version.json
+const APP_VERSION="10";   // à changer aussi dans version.json
 document.getElementById('ver').textContent=APP_VERSION;document.getElementById('vv').textContent=APP_VERSION;
 const go=t=>document.querySelector('nav [data-t="'+t+'"]').click();
 try{if(!localStorage.getItem('m2m_info'))document.getElementById('rg').style.display='flex'}catch(e){}
@@ -282,8 +282,7 @@ const FIELDS=[
  ['sitfam','Situation familiale','select',1,['Célibataire','Marié(e)','Divorcé(e)','Veuf(ve)','Famille monoparentale']],
  ['orientation','Comment avez-vous connu M2M ?','select',0,['Mosquée','CCAS / mairie','Bouche-à-oreille','Réseaux sociaux','Autre']],
  ['autreStructure','Autre structure qui suit la famille (CCAS, Secours Catholique, Croix-Rouge…)','text',0],
- ['nbPers','Nombre de personnes dans le foyer','number',1],['nbEnf','Dont enfants à charge','number',1],
- ['foyer','Composition du foyer : une personne par ligne (prénom, lien, âge, besoin utile : couches, lait infantile, scolarité…)','textarea',1],
+  ['foyer','Précisions sur le foyer et besoins particuliers (couches, lait infantile, scolarité, santé…)','textarea',0],
  ['pro','Situation professionnelle du demandeur','select',1,['Salarié','Indépendant','Demandeur d’emploi','Étudiant','Retraité','Sans activité','Autre']],
  ['logement','Logement','select',1,['Locataire (parc privé)','Locataire (logement social)','Propriétaire','Hébergé à titre gratuit (famille, amis)','Hébergé avec participation / sous-location','Hébergement d’urgence / foyer / hôtel social','Sans logement stable']],
  ['loyer','Loyer restant à charge (€/mois)','number',0],
@@ -293,10 +292,20 @@ const FIELDS=[
  ['situation','Votre situation et vos besoins (isolement, logement précaire, difficulté financière…)','textarea',1],
  ['mode','Remise de l’aide','select',1,['Je viens la récupérer','Livraison à domicile (je ne peux pas me déplacer)']]
 ];
+const COMPO=`<div class="card" style="margin:12px 0;padding:12px"><b>Composition du foyer</b> <span class="er">*</span>
+  <label class="l">Adultes : nombre de femmes</label><input type="number" id="f_femmes" min="0" max="20" inputmode="numeric" value="0">
+  <label class="l">Adultes : nombre d’hommes</label><input type="number" id="f_hommes" min="0" max="20" inputmode="numeric" value="0">
+  <label class="l">Enfants à charge</label><div id="f_enf"></div>
+  <button type="button" class="btn l" id="f_addenf">＋ Ajouter un enfant</button>
+  <small class="m">Pour chaque enfant : fille ou garçon, et mois et année de naissance. Cela nous permet de préparer les bons produits (couches, lait infantile, fournitures scolaires…).</small></div>`;
 $('f_fields').innerHTML=FIELDS.map(([id,l,t,r,o])=>{
   const lab=`<label class="l">${l}${r?' <span class="er">*</span>':''}</label>`;
   const i=t==='select'?`<select id="f_${id}"><option value="">Choisir…</option>${o.map(x=>`<option>${x}</option>`).join('')}</select>`:t==='textarea'?`<textarea id="f_${id}" rows="3"></textarea>`:`<input type="${t}" id="f_${id}">`;
-  return lab+i}).join('');
+  return lab+i+(id==='autreStructure'?COMPO:'')}).join('');
+function addEnf(){const r=document.createElement('div');r.className='enf';r.style.cssText='display:flex;gap:6px;align-items:center;margin:6px 0';
+  r.innerHTML='<select class="e_s"><option value="">Fille / garçon…</option><option value="F">Fille</option><option value="G">Garçon</option></select><input type="month" class="e_b" style="flex:1" max="'+new Date().toISOString().slice(0,7)+'"><button type="button" class="e_x" style="border:1px solid #b00020;color:#b00020;background:#fff;border-radius:8px;padding:8px 12px">✕</button>';
+  r.querySelector('.e_x').onclick=()=>r.remove();$('f_enf').appendChild(r)}
+$('f_addenf').onclick=addEnf;
 const docInputs=()=>PIECES.map(([k,t])=>`<label class="l">${t} <small class="m">${k==='sej'?'(si pertinent)':'(à fournir)'}</small></label><input type="file" data-f="${k}" accept="image/*,application/pdf" multiple>`).join('');
 $('f_docs').innerHTML=docInputs();$('s_docs').innerHTML=docInputs();
 // bouton « Retirer » à côté de chaque pièce choisie (en cas d'erreur de fichier)
@@ -306,6 +315,11 @@ function res(el,r,intro){el.className=r.manquant?'wa':'ok';el.innerHTML=intro+(r
 $('f_send').onclick=async()=>{
   const m=$('f_msg'),d={action:'submit',pwd:pwd(),website:$('f_web').value},miss=[];
   FIELDS.forEach(([id,l,t,r])=>{const e=$('f_'+id),v=e.value.trim();d[id]=v;if(r&&!v){miss.push(l.split(' (')[0].split(' :')[0]);e.style.borderColor='#b00020'}else e.style.borderColor=''});
+  const fem=Math.max(0,parseInt($('f_femmes').value,10)||0),hom=Math.max(0,parseInt($('f_hommes').value,10)||0),kids=[];let kidErr=false;
+  document.querySelectorAll('#f_enf .enf').forEach(r=>{const sx=r.querySelector('.e_s').value,b=r.querySelector('.e_b').value,ok=sx&&/^\d{4}-\d{2}$/.test(b);r.style.outline=ok?'':'2px solid #b00020';if(ok)kids.push(sx+' '+b.slice(5)+'/'+b.slice(0,4));else kidErr=true});
+  if(fem+hom<1)miss.push('Composition du foyer (au moins un adulte)');
+  if(kidErr)miss.push('Enfants (fille/garçon et mois de naissance)');
+  d.femmes=fem;d.hommes=hom;d.enfants=kids.join(', ');d.nbPers=fem+hom+kids.length;d.nbEnf=kids.length;
   d.c1=$('c1').checked;d.c2=$('c2').checked;d.c3=$('c3').checked;
   if(miss.length){m.className='er';m.textContent='Champs obligatoires à remplir : '+miss.join(', ');return}
   if(!(d.c1&&d.c2&&d.c3)){m.className='er';m.textContent='Les trois cases RGPD doivent être cochées.';return}
@@ -354,7 +368,7 @@ function drawB(){
 function det(c){
   const x=ROWS.find(r=>r.code===c);if(!x)return;
   $('b_det').innerHTML=`<div class="card"><h2>${esc(x.code)} – ${esc(x.civilite)} ${esc(x.nom)} ${esc(x.prenom)}</h2>
-  <p>📞 <a href="tel:${esc(x.tel)}">${esc(x.tel)}</a>${x.email?' · '+esc(x.email):''}<br>📍 ${esc(x.adresse)}<br>👨‍👩‍👧 ${esc(x.nbPers)} pers. dont ${esc(x.nbEnf)} enfant(s) · ressources ${esc(x.ressources)} €<br><b>Remise :</b> ${esc(x.mode)}<br><b>Besoins :</b> ${esc(x.situation)}<br><b>Foyer :</b> ${esc(x.foyer)}</p>
+  <p>📞 <a href="tel:${esc(x.tel)}">${esc(x.tel)}</a>${x.email?' · '+esc(x.email):''}<br>📍 ${esc(x.adresse)}<br>👨‍👩‍👧 ${esc(x.nbPers)} pers. dont ${esc(x.nbEnf)} enfant(s) · ressources ${esc(x.ressources)} €<br><b>Remise :</b> ${esc(x.mode)}<br><b>Besoins :</b> ${esc(x.situation)}<br><b>Composition :</b> ${esc(x.femmes)} femme(s), ${esc(x.hommes)} homme(s) · enfants : ${esc(x.enfants)||'aucun'}<br><b>Précisions :</b> ${esc(x.foyer)}</p>
   <p><b>Pièces reçues :</b> ${esc(x.recues)||'aucune'}<br><b>Manque :</b> ${esc(x.manquant)||'rien'}</p>
   <a class="btn l" href="${esc(x.drive)}" target="_blank" rel="noopener">Ouvrir le dossier Drive</a>
   <label class="l">Statut</label><select id="u_st">${STAT.map(s=>`<option ${s===x.statut?'selected':''}>${s}</option>`).join('')}</select>
