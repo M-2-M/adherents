@@ -12,7 +12,7 @@
 :root{--g:#2f5d2b;--o:#b8892b;--bg:#f7f5ef;--card:#fff;--tx:#1d2a1c;--mu:#667;--bd:#e2ded0}
 @media(prefers-color-scheme:dark){:root{--bg:#141a13;--card:#1e271d;--tx:#eef2ea;--mu:#a9b3a5;--bd:#33402f;--g:#6fae68}}
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:70px}
+body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:24px}
 header{background:#2f5d2b;color:#fff;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top,0px))}
 header{display:flex;align-items:center;gap:12px}header img{width:52px;height:52px;background:#fff;border-radius:50%;padding:3px}header b{font-size:18px}header small{display:block;color:#e6c27a}
 #upd{display:none;position:sticky;top:0;z-index:60;background:var(--o);color:#fff;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));text-align:center;font-weight:700}
@@ -38,14 +38,21 @@ label.l{font-size:14px;font-weight:600;display:block}details>summary{font-weight
 .nw{display:block;padding:9px 0;border-bottom:1px solid var(--bd);color:var(--tx);text-decoration:none}.nw small{display:block;color:var(--mu)}
 .bc{display:flex;gap:12px;align-items:center;margin:8px 0}.bc img,.bc i{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--bd);flex:none}.bc small{display:block;color:var(--mu)}
 #rg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}#rg>div{background:var(--card);border-radius:14px;padding:20px;max-width:420px}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
-nav button{flex:1;padding:12px 4px;border:0;background:none;color:var(--mu);font-size:13px;font-weight:600}
-nav button.on{color:var(--g);border-top:3px solid var(--o)}
+nav{position:sticky;top:0;z-index:40;display:flex;background:#2f5d2b;border-bottom:3px solid #b8892b}
+nav button{flex:1;padding:12px 2px;border:0;background:none;color:#dfe8dc;font-size:13px;font-weight:600}
+nav button.on{color:#fff;box-shadow:inset 0 -3px 0 #e6c27a}
+.wa{background:#fff3e0;color:#8a4b00;padding:10px;border-radius:8px;margin:8px 0}
 </style>
 </head>
 <body>
 <div id="upd">Nouvelle version disponible <button id="updBtn">Mettre à jour</button></div>
 <header><img src="logo.png" alt="Logo M2M"><div><b>M2M – Musulman(e)s de Meudon</b><small>Application M2M · V<span id="vv"></span></small></div></header>
+<nav>
+  <button data-t="home" class="on">Accueil</button>
+  <button data-t="aide">Espace bénéficiaire</button>
+  <button data-t="infos">Qui sommes-nous</button>
+  <button data-t="bureau" id="navb" style="display:none">Bureau</button>
+</nav>
 <main>
 
 <section id="home" class="on">
@@ -56,7 +63,6 @@ nav button.on{color:var(--g);border-top:3px solid var(--o)}
     <div class="pt" id="pt"></div>
     <p id="juma" style="margin:10px 0 0"></p>
     <small class="m" id="ptdate"></small>
-    <a class="btn l" href="https://mawaqit.net/fr/mon-domicile-clamart-tv" target="_blank" rel="noopener">Ouvrir MAWAQIT (référence)</a>
   </div>
   <div class="card">
     <h2>Nous rejoindre</h2>
@@ -88,37 +94,27 @@ nav button.on{color:var(--g);border-top:3px solid var(--o)}
     <div id="docs"></div>
     <p><b>Selon votre situation seulement :</b><br><small class="m">justificatifs de charges importantes · jugement ou ordonnance de pension alimentaire et sommes versées/perçues · facture, relance ou échéancier en cas de dette</small></p>
   </div>
-  <div class="card">
+  <div class="card needs">
     <details id="dep"><summary>Déposer mon dossier en ligne</summary>
-    <p><small class="m">Pour les personnes qui ne peuvent pas se déplacer. Seuls le Bureau et les référents action sociale accèdent à ces informations.</small></p>
+    <p><small class="m">Les champs marqués <span class="er">*</span> sont obligatoires. Vous pouvez aussi venir nous voir : nous le remplissons ensemble.</small></p>
     <input class="hp" id="f_web" tabindex="-1" autocomplete="off">
-    <label class="l">Nom *</label><input type="text" id="f_nom" autocomplete="family-name">
-    <label class="l">Prénom *</label><input type="text" id="f_pre" autocomplete="given-name">
-    <label class="l">Date de naissance</label><input type="date" id="f_nai">
-    <label class="l">Adresse (Meudon) *</label><input type="text" id="f_adr" autocomplete="street-address">
-    <label class="l">Téléphone *</label><input type="tel" id="f_tel" autocomplete="tel">
-    <label class="l">E-mail</label><input type="email" id="f_ema" autocomplete="email">
-    <label class="l">Nombre de personnes dans le foyer</label><input type="number" id="f_nbp" min="1">
-    <label class="l">Dont enfants à charge</label><input type="number" id="f_nbe" min="0">
-    <label class="l">Votre situation / besoins (couches, lait infantile, scolarité…)</label><textarea id="f_sit" rows="3"></textarea>
-    <label class="l">Remise de l’aide</label>
-    <select id="f_mod"><option>Je viens la récupérer</option><option>Je ne peux pas me déplacer : livraison à domicile souhaitée</option></select>
-    <label class="l">Mes documents (photos ou PDF)</label>
-    <input type="file" id="f_files" accept="image/*,application/pdf" multiple>
-    <small class="m">Les photos sont réduites automatiquement. Maximum conseillé : 10 fichiers.</small>
+    <div id="f_fields"></div>
+    <h2 style="margin-top:12px">Mes documents</h2><small class="m">Photos ou PDF. Un document manquant n’empêche pas l’envoi : vous pourrez l’ajouter plus tard.</small>
+    <div id="f_docs"></div>
     <div class="card" style="margin-top:12px"><b>Information RGPD</b>
-    <p><small>Vos informations sont destinées à l’association M2M (responsable de traitement), seule destinataire, pour évaluer votre demande d’aide et la suivre. L’aide est apportée sans condition d’appartenance ni de pratique religieuse. Vos documents sont déposés dans un espace Google Drive réservé au Bureau. Durée de conservation : <span id="ret"></span>. Vous pouvez exercer vos droits (accès, rectification, effacement, limitation, opposition) auprès de corresp.m2m@gmail.com.</small></p>
-    <label class="ck"><input type="checkbox" id="c1"><span>Je reconnais avoir pris connaissance des informations ci-dessus concernant le traitement de mes données personnelles.</span></label>
-    <label class="ck"><input type="checkbox" id="c2"><span>Je donne mon consentement exprès au traitement de mes données sensibles, dans la mesure strictement nécessaire à l’évaluation de ma situation.</span></label>
-    <label class="ck"><input type="checkbox" id="c3"><span>Je certifie sur l’honneur l’exactitude des informations et pièces fournies, et je m’engage à signaler tout changement de ma situation.</span></label></div>
+    <p><small>Vos informations sont destinées à l’association M2M, seule destinataire, pour évaluer votre demande d’aide et la suivre. Elles ne sont accessibles qu’au Bureau et aux référents action sociale. L’aide est apportée sans condition religieuse. Durée de conservation : <span id="ret"></span>. Droits d’accès, rectification, effacement, limitation, opposition : corresp.m2m@gmail.com.</small></p>
+    <label class="ck"><input type="checkbox" id="c1"><span>Je reconnais avoir pris connaissance des informations ci-dessus concernant le traitement de mes données personnelles. <span class="er">*</span></span></label>
+    <label class="ck"><input type="checkbox" id="c2"><span>Je donne mon consentement exprès au traitement de mes données sensibles, dans la mesure strictement nécessaire à l’évaluation de ma situation. <span class="er">*</span></span></label>
+    <label class="ck"><input type="checkbox" id="c3"><span>Je certifie sur l’honneur l’exactitude des informations et pièces fournies, et je m’engage à signaler tout changement. <span class="er">*</span></span></label></div>
     <button class="btn" id="f_send">Envoyer mon dossier</button><div id="f_msg"></div>
     </details>
   </div>
-  <div class="card">
-    <details><summary>Suivre mon dossier</summary>
-    <label class="l">Code du dossier</label><input type="text" id="s_code" placeholder="M2M-XXXXXXXX" autocapitalize="characters">
+  <div class="card needs">
+    <details><summary>Suivre / compléter mon dossier</summary>
+    <label class="l">Numéro de famille (ex. F006) ou nom de famille</label><input type="text" id="s_id" placeholder="F006">
     <label class="l">4 derniers chiffres de mon téléphone</label><input type="tel" id="s_pin" maxlength="4" inputmode="numeric">
-    <button class="btn" id="s_go">Voir l’état de mon dossier</button><div id="s_out"></div>
+    <button class="btn" id="s_go">Voir mon dossier</button><div id="s_out"></div>
+    <div id="s_add" style="display:none"><h2>Ajouter des documents</h2><div id="s_docs"></div><button class="btn" id="s_send">Envoyer ces documents</button><div id="s_msg"></div></div>
     </details>
   </div>
   <div class="card">
@@ -132,6 +128,17 @@ nav button.on{color:var(--g);border-top:3px solid var(--o)}
   <div class="card"><button class="btn l" id="wipe">Effacer ma liste sur cet appareil</button></div>
 </section>
 
+<section id="bureau">
+  <div class="card"><h2>Espace Bureau</h2>
+    <div id="b_login"><input type="password" id="b_pwd" placeholder="Mot de passe Bureau"><button class="btn" id="b_go">Se connecter</button><div id="b_err" class="er"></div></div>
+    <div id="b_app" style="display:none">
+      <button class="btn o" id="b_new">Nouveau dossier (face à face)</button>
+      <input type="text" id="b_q" placeholder="Rechercher : n° famille, nom…">
+      <div id="b_list"></div><div id="b_det"></div>
+      <button class="btn l" id="b_out">Quitter l’espace Bureau</button>
+    </div></div>
+</section>
+
 <section id="infos">
   <div class="card">
     <h2>Contact</h2>
@@ -141,20 +148,21 @@ nav button.on{color:var(--g);border-top:3px solid var(--o)}
     <a class="btn l" href="https://m2m-meudon.fr/index.php/politique-confidentialite/" target="_blank" rel="noopener">Politique de confidentialité</a>
     <a class="btn l" href="https://m2m-meudon.fr" target="_blank" rel="noopener">Site m2m-meudon.fr</a>
   </div>
-  <div class="card" id="bur" style="display:none"><h2>Le Bureau</h2><div id="burl"></div><h2 style="margin-top:14px">Conseil d’administration</h2><div id="cal"></div></div>
+  <div class="card"><h2>Qui sommes-nous ?</h2><p>M2M – Musulman(e)s de Meudon est une association locale : un lieu de spiritualité, de transmission et de fraternité au service des habitants de Meudon, avec des actions solidaires (colis alimentaires, kits scolaires). En attendant un local à Meudon, les prières ont lieu à la mosquée de Clamart.</p></div>
+  <div class="card" id="bur"><h2>Le Bureau</h2><div id="burl"></div><h2 style="margin-top:14px">Conseil d’administration</h2><div id="cal"></div></div>
+  <div class="card"><details><summary>Protection de vos données (RGPD)</summary>
+  <p>Les informations recueillies sont destinées à l’association M2M – Musulman(e)s de Meudon, seule destinataire des données, aux fins d’évaluation de l’éligibilité aux campagnes de solidarité (kits de rentrée scolaire, distribution de colis alimentaires) et de suivi de l’accompagnement social des familles.</p>
+  <p>M2M ne collecte que les données nécessaires à l’évaluation des demandes et au suivi des aides. Les données sont accessibles uniquement aux personnes habilitées par l’association (Bureau et référents action sociale). Durée de conservation : <span id="ret2"></span>.</p>
+  <p>Responsable de traitement : l’association M2M – Musulman(e)s de Meudon, représentée par son Président. La gestion opérationnelle des dossiers est assurée par la Secrétaire de l’association, avec un accès limité aux référents action sociale désignés par le Bureau.</p>
+  <p>L’accompagnement proposé par M2M est apporté à toute personne en situation de besoin, sans condition d’appartenance religieuse ni obligation de pratique cultuelle. Le refus de participer à une activité religieuse ou communautaire de l’association n’a aucune incidence sur l’accès à l’aide sollicitée.</p>
+  <p>Conformément au RGPD, vous disposez notamment de droits d’accès, de rectification, d’effacement, de limitation et, selon la base légale applicable, d’opposition ou de retrait du consentement. Vous pouvez les exercer auprès du Secrétariat : corresp.m2m@gmail.com.</p></details></div>
   <div class="card"><small class="m">Version <span id="ver"></span></small></div>
 </section>
 </main>
 
-<nav>
-  <button data-t="home" class="on">Accueil</button>
-  <button data-t="aide">Espace bénéficiaire</button>
-  <button data-t="infos">Infos</button>
-</nav>
-
 <div id="rg"><div><h2>Bienvenue</h2><p>Cette application ne vous suit pas et ne collecte rien automatiquement.</p><p>Si vous déposez un dossier dans l’Espace bénéficiaire, vos informations et documents ne sont accessibles qu’au <b>Bureau</b> et aux <b>référents action sociale</b> de M2M. Votre accord vous sera demandé avant tout envoi.</p><button class="btn" id="rgok">J’ai compris</button></div></div>
 <script>
-const APP_VERSION="4";   // à changer aussi dans version.json
+const APP_VERSION="5";   // à changer aussi dans version.json
 document.getElementById('ver').textContent=APP_VERSION;document.getElementById('vv').textContent=APP_VERSION;
 const go=t=>document.querySelector('nav [data-t="'+t+'"]').click();
 try{if(!localStorage.getItem('m2m_info'))document.getElementById('rg').style.display='flex'}catch(e){}
@@ -199,7 +207,7 @@ fetch('gazettes.json',{cache:'no-cache'}).then(r=>r.json()).then(g=>{
   el.innerHTML=g.map(x=>`<a class="nw" href="gazettes/${encodeURIComponent(x.fichier)}" target="_blank" rel="noopener"><b>${x.titre}</b><small>${x.date||''}</small></a>`).join('');
 }).catch(()=>{});
 fetch('bureau.json',{cache:'no-cache'}).then(r=>r.json()).then(b=>{
-  const m=(b.bureau||[]).filter(x=>x.nom);if(!m.length&&!(b.ca||[]).length)return;
+  const m=(b.bureau||[]).filter(x=>x.nom);if(!m.length&&!(b.ca||[]).length){document.getElementById('burl').innerHTML='<small class="m">Présentation du Bureau bientôt disponible.</small>';return}
   document.getElementById('bur').style.display='block';
   document.getElementById('burl').innerHTML=m.map(x=>`<div class="bc">${x.photo?`<img src="photos/${encodeURIComponent(x.photo)}" alt="">`:'<i></i>'}<div><b>${x.nom}</b><small>${x.role}</small></div></div>`).join('');
   document.getElementById('cal').textContent=(b.ca||[]).join(' · ');
@@ -225,14 +233,18 @@ document.getElementById('wipe').onclick=()=>{
   if(confirm('Effacer votre liste sur cet appareil ?')){localStorage.removeItem('m2m_docs');location.reload()}};
 
 
-// ===== Dépôt de dossier et suivi (Google Apps Script) =====
-const SCRIPT_URL="";            // URL « Application Web » du script Google (voir instructions)
+// ===== Dépôt de dossier, suivi et espace Bureau (Google Apps Script) =====
+const SCRIPT_URL="";            // URL « Application Web » du script Google
 const RETENTION="2 ans après la dernière aide ou le dernier contact, puis suppression";
-document.getElementById('ret').textContent=RETENTION;
-if(!SCRIPT_URL)document.querySelectorAll('details').forEach(d=>d.closest('.card').style.display='none');
+document.getElementById('ret').textContent=RETENTION;document.getElementById('ret2').textContent=RETENTION;
+if(!SCRIPT_URL)document.querySelectorAll('.needs').forEach(x=>x.style.display='none');
 const $=i=>document.getElementById(i);
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const api=b=>fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(r=>r.json());
 const b64=blob=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(blob)});
+const pwd=()=>{try{return localStorage.getItem('m2m_pwd')||''}catch(e){return ''}};
+const STAT=['Reçu',"En cours d'examen",'Incomplet','Accepté','Accepté partiellement','Refusé'];
 async function prep(f){
   if(f.type.startsWith('image/')){
     const bmp=await createImageBitmap(f),k=Math.min(1,1600/Math.max(bmp.width,bmp.height));
@@ -242,39 +254,100 @@ async function prep(f){
   }
   return {name:f.name,type:f.type,data:await b64(f)};
 }
+async function collect(root){const o=[];for(const i of root.querySelectorAll('[data-f]'))for(const f of i.files){const p=await prep(f);p.label=i.dataset.f;o.push(p)}return o}
+// Champs du dossier : [clé, libellé, type, obligatoire, options]
+const FIELDS=[
+ ['nom','Nom','text',1],['prenom','Prénom','text',1],['naissance','Date de naissance','date',1],
+ ['adresse','Adresse complète','text',1],['tel','Téléphone','tel',1],['email','E-mail','email',0],
+ ['sitfam','Situation familiale','select',1,['Célibataire','Marié(e)','Divorcé(e)','Veuf(ve)','Famille monoparentale']],
+ ['orientation','Comment avez-vous connu M2M ?','select',0,['Mosquée','CCAS / mairie','Bouche-à-oreille','Réseaux sociaux','Autre']],
+ ['autreStructure','Autre structure qui suit la famille (CCAS, Secours Catholique, Croix-Rouge…)','text',0],
+ ['nbPers','Nombre de personnes dans le foyer','number',1],['nbEnf','Dont enfants à charge','number',1],
+ ['foyer','Composition du foyer : une personne par ligne (prénom, lien, âge, besoin utile : couches, lait infantile, scolarité…)','textarea',1],
+ ['pro','Situation professionnelle du demandeur','select',1,['Salarié','Indépendant','Demandeur d’emploi','Retraité','Sans activité','Autre']],
+ ['logement','Logement','select',1,['Locataire','Propriétaire','Hébergé']],
+ ['loyer','Loyer restant à charge (€/mois)','number',0],
+ ['ressources','Total des ressources mensuelles du foyer (€)','number',1],
+ ['charges','Total des charges principales (€/mois)','number',0],
+ ['qf','Quotient familial CAF','text',0],
+ ['situation','Votre situation et vos besoins (isolement, logement précaire, difficulté financière…)','textarea',1],
+ ['mode','Remise de l’aide','select',1,['Je viens la récupérer','Livraison à domicile (je ne peux pas me déplacer)']]
+];
+$('f_fields').innerHTML=FIELDS.map(([id,l,t,r,o])=>{
+  const lab=`<label class="l">${l}${r?' <span class="er">*</span>':''}</label>`;
+  const i=t==='select'?`<select id="f_${id}"><option value="">Choisir…</option>${o.map(x=>`<option>${x}</option>`).join('')}</select>`:t==='textarea'?`<textarea id="f_${id}" rows="3"></textarea>`:`<input type="${t}" id="f_${id}">`;
+  return lab+i}).join('');
+const docInputs=()=>PIECES.map(([k,t])=>`<label class="l">${t} <small class="m">${k==='sej'?'(si pertinent)':'(à fournir)'}</small></label><input type="file" data-f="${k}" accept="image/*,application/pdf" multiple>`).join('');
+$('f_docs').innerHTML=docInputs();$('s_docs').innerHTML=docInputs();
+function res(el,r,intro){el.className=r.manquant?'wa':'ok';el.innerHTML=intro+(r.manquant?'<br>⚠ Il manque encore : '+esc(r.manquant)+'. Vous pourrez l’ajouter dans « Suivre / compléter mon dossier ».':'<br>✅ Votre dossier est complet.')}
 $('f_send').onclick=async()=>{
-  const m=$('f_msg');m.className='';
-  if(!$('f_nom').value||!$('f_pre').value||!$('f_tel').value){m.className='er';m.textContent='Merci de remplir nom, prénom et téléphone.';return}
-  if(!($('c1').checked&&$('c2').checked&&$('c3').checked)){m.className='er';m.textContent='Les trois cases RGPD doivent être cochées.';return}
-  const fl=[...$('f_files').files];
-  if(fl.reduce((a,f)=>a+f.size,0)>40e6){m.className='er';m.textContent='Fichiers trop volumineux.';return}
-  $('f_send').disabled=true;m.textContent='Envoi en cours…';
+  const m=$('f_msg'),d={action:'submit',pwd:pwd(),website:$('f_web').value},miss=[];
+  FIELDS.forEach(([id,l,t,r])=>{const e=$('f_'+id),v=e.value.trim();d[id]=v;if(r&&!v){miss.push(l.split(' (')[0].split(' :')[0]);e.style.borderColor='#b00020'}else e.style.borderColor=''});
+  d.c1=$('c1').checked;d.c2=$('c2').checked;d.c3=$('c3').checked;
+  if(miss.length){m.className='er';m.textContent='Champs obligatoires à remplir : '+miss.join(', ');return}
+  if(!(d.c1&&d.c2&&d.c3)){m.className='er';m.textContent='Les trois cases RGPD doivent être cochées.';return}
+  $('f_send').disabled=true;m.className='';m.textContent='Envoi en cours…';
   try{
-    const files=[];for(const f of fl)files.push(await prep(f));
-    const r=await api({action:'submit',website:$('f_web').value,nom:$('f_nom').value,prenom:$('f_pre').value,naissance:$('f_nai').value,adresse:$('f_adr').value,tel:$('f_tel').value,email:$('f_ema').value,nbPers:$('f_nbp').value,nbEnf:$('f_nbe').value,situation:$('f_sit').value,mode:$('f_mod').value,c1:$('c1').checked,c2:$('c2').checked,c3:$('c3').checked,files});
-    if(r.ok){m.className='ok';m.innerHTML='Dossier envoyé. <b>Notez votre code : '+r.code+'</b><br>Pour le suivre, il faudra ce code et les 4 derniers chiffres de votre téléphone.';try{localStorage.setItem('m2m_code',r.code)}catch(e){}$('s_code').value=r.code}
+    d.files=await collect($('f_docs'));
+    const r=await api(d);
+    if(r.ok){res(m,r,'✅ <b>Dossier envoyé.</b> Votre numéro de famille : <b>'+esc(r.code)+'</b> (notez-le).');$('s_id').value=r.code}
     else{m.className='er';m.textContent=r.error||'Échec de l’envoi.'}
   }catch(e){m.className='er';m.textContent='Échec de l’envoi. Réessayez ou contactez M2M.'}
   $('f_send').disabled=false;
 };
-try{$('s_code').value=localStorage.getItem('m2m_code')||''}catch(e){}
-const esc=t=>String(t||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 async function suivi(){
-  const o=$('s_out');o.textContent='Recherche…';
+  const o=$('s_out');o.textContent='Recherche…';$('s_add').style.display='none';
   try{
-    const r=await api({action:'status',code:$('s_code').value,pin:$('s_pin').value});
-    if(!r.ok){o.innerHTML='<p class="er">Dossier introuvable. Vérifiez le code et les 4 chiffres.</p>';return}
-    let h='<div class="ok"><b>État : '+esc(r.statut)+'</b></div>';
+    const r=await api({action:'status',id:$('s_id').value,pin:$('s_pin').value});
+    if(!r.ok){o.innerHTML='<p class="er">Dossier introuvable. Vérifiez le numéro (ou le nom) et les 4 chiffres.</p>';return}
+    let h='<div class="ok"><b>Famille '+esc(r.code)+' – état : '+esc(r.statut)+'</b></div>';
     if(r.message)h+='<p>'+esc(r.message)+'</p>';
-    if(r.manquant)h+='<p><b>Pièces manquantes :</b> '+esc(r.manquant)+'</p>';
+    if(r.manquant)h+='<div class="wa">Pièces manquantes : '+esc(r.manquant)+'</div>';
     if(r.creneau){h+='<p><b>Créneau proposé :</b> '+esc(r.creneau)+'</p>';
       if(r.reponse)h+='<p><small>Votre réponse : '+esc(r.reponse)+'</small></p>';
       else h+='<button class="btn" data-r="ok">Je confirme ce créneau</button><button class="btn l" data-r="no">Je ne suis pas disponible</button>'}
-    o.innerHTML=h;
-    o.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await api({action:'reply',code:$('s_code').value,pin:$('s_pin').value,reply:b.dataset.r});suivi()});
+    o.innerHTML=h;$('s_add').style.display='block';
+    o.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await api({action:'reply',id:$('s_id').value,pin:$('s_pin').value,reply:b.dataset.r});suivi()});
   }catch(e){o.innerHTML='<p class="er">Service indisponible, réessayez plus tard.</p>'}
 }
 $('s_go').onclick=suivi;
+$('s_send').onclick=async()=>{
+  const m=$('s_msg');m.className='';m.textContent='Envoi en cours…';
+  try{const files=await collect($('s_docs'));
+    if(!files.length){m.className='er';m.textContent='Ajoutez au moins un document.';return}
+    const r=await api({action:'addDocs',id:$('s_id').value,pin:$('s_pin').value,files});
+    if(r.ok){res(m,r,'✅ <b>Documents bien reçus.</b>');suivi()}else{m.className='er';m.textContent=r.error||'Échec.'}
+  }catch(e){m.className='er';m.textContent='Échec de l’envoi.'}
+};
+// ----- Espace Bureau : 5 appuis sur le logo, puis mot de passe -----
+let ROWS=[],tp=0;
+function bureauUI(ok){$('navb').style.display='';$('b_login').style.display=ok?'none':'block';$('b_app').style.display=ok?'block':'none'}
+async function loadB(){const r=await api({action:'list',pwd:pwd()});if(!r.ok)return false;ROWS=r.rows;drawB();return true}
+function drawB(){
+  const q=norm($('b_q').value);
+  $('b_list').innerHTML=ROWS.filter(x=>!q||norm(x.code+' '+x.nom+' '+x.prenom).includes(q)).map(x=>`<a class="nw" href="#" data-c="${esc(x.code)}"><b>${esc(x.code)} – ${esc(x.nom)} ${esc(x.prenom)}</b><small>${esc(x.statut)}${x.manquant?' · manque : '+esc(x.manquant):''}</small></a>`).join('')||'<small class="m">Aucun dossier.</small>';
+  $('b_list').querySelectorAll('[data-c]').forEach(a=>a.onclick=e=>{e.preventDefault();det(a.dataset.c)});
+}
+function det(c){
+  const x=ROWS.find(r=>r.code===c);if(!x)return;
+  $('b_det').innerHTML=`<div class="card"><h2>${esc(x.code)} – ${esc(x.nom)} ${esc(x.prenom)}</h2>
+  <p>📞 <a href="tel:${esc(x.tel)}">${esc(x.tel)}</a>${x.email?' · '+esc(x.email):''}<br>📍 ${esc(x.adresse)}<br>👨‍👩‍👧 ${esc(x.nbPers)} pers. dont ${esc(x.nbEnf)} enfant(s) · ressources ${esc(x.ressources)} €<br><b>Remise :</b> ${esc(x.mode)}<br><b>Besoins :</b> ${esc(x.situation)}<br><b>Foyer :</b> ${esc(x.foyer)}</p>
+  <p><b>Pièces reçues :</b> ${esc(x.recues)||'aucune'}<br><b>Manque :</b> ${esc(x.manquant)||'rien'}</p>
+  <a class="btn l" href="${esc(x.drive)}" target="_blank" rel="noopener">Ouvrir le dossier Drive</a>
+  <label class="l">Statut</label><select id="u_st">${STAT.map(s=>`<option ${s===x.statut?'selected':''}>${s}</option>`).join('')}</select>
+  <label class="l">Message au bénéficiaire</label><textarea id="u_msg" rows="2">${esc(x.message)}</textarea>
+  <label class="l">Créneau proposé (ex. samedi 21/11, 10h-12h)</label><input type="text" id="u_cr" value="${esc(x.creneau)}">
+  ${x.reponse?`<p><small>Réponse du bénéficiaire : ${esc(x.reponse)}</small></p>`:''}
+  <button class="btn" id="u_go">Enregistrer</button><small id="u_m"></small></div>`;
+  $('u_go').onclick=async()=>{const r=await api({action:'update',pwd:pwd(),code:c,statut:$('u_st').value,message:$('u_msg').value,creneau:$('u_cr').value});$('u_m').textContent=r.ok?'Enregistré.':'Échec.';if(r.ok)loadB()};
+}
+document.querySelector('header img').onclick=()=>{if(SCRIPT_URL&&++tp>=5){tp=0;bureauUI(false);go('bureau')}};
+$('b_go').onclick=async()=>{try{localStorage.setItem('m2m_pwd',$('b_pwd').value)}catch(e){}
+  if(await loadB())bureauUI(true);else{$('b_err').textContent='Mot de passe incorrect.';try{localStorage.removeItem('m2m_pwd')}catch(e){}}};
+$('b_q').oninput=drawB;
+$('b_new').onclick=()=>{go('aide');$('dep').open=true;$('dep').scrollIntoView()};
+$('b_out').onclick=()=>{try{localStorage.removeItem('m2m_pwd')}catch(e){}location.reload()};
+if(SCRIPT_URL&&pwd())loadB().then(ok=>{if(ok)bureauUI(true)});
 
 // Mise à jour : on compare la version de cette page à version.json (bandeau en haut)
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
