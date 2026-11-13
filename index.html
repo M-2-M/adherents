@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>M2M – Musulman(e)s de Meudon</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#2f5d2b">
+<style>
+:root{--g:#2f5d2b;--o:#b8892b;--bg:#f7f5ef;--card:#fff;--tx:#1d2a1c;--mu:#667;--bd:#e2ded0}
+@media(prefers-color-scheme:dark){:root{--bg:#141a13;--card:#1e271d;--tx:#eef2ea;--mu:#a9b3a5;--bd:#33402f;--g:#6fae68}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:70px}
+header{background:#2f5d2b;color:#fff;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top,0px))}
+header{display:flex;align-items:center;gap:12px}header img{width:52px;height:52px;background:#fff;border-radius:50%;padding:3px}header b{font-size:18px}header small{display:block;color:#e6c27a}
+#upd{display:none;background:var(--o);color:#fff;padding:10px 16px;text-align:center;font-weight:600}
+#upd button{margin-left:8px;border:0;border-radius:6px;padding:6px 10px;font-weight:700}
+main{max-width:640px;margin:auto;padding:14px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+h2{margin:0 0 8px;font-size:18px;color:var(--g)}
+.pt{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pt div{text-align:center;background:var(--bg);border-radius:8px;padding:8px 2px}
+.pt span{display:block;font-size:12px;color:var(--mu)}.pt b{font-size:17px}
+.btn{display:block;width:100%;text-align:center;padding:13px;margin:8px 0;border-radius:10px;background:var(--g);color:#fff;text-decoration:none;font-weight:600;border:0;font-size:16px}
+.btn.o{background:var(--o)}.btn.l{background:transparent;color:var(--g);border:2px solid var(--g)}
+small.m{color:var(--mu)}
+label.ck{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--bd)}
+label.ck input[type=checkbox]{width:22px;height:22px;margin-top:2px}
+.f{font-size:13px;color:var(--mu);margin-top:3px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;padding:12px 4px;border:0;background:none;color:var(--mu);font-size:13px;font-weight:600}
+nav button.on{color:var(--g);border-top:3px solid var(--o)}
+</style>
+</head>
+<body>
+<div id="upd">Nouvelle version disponible <button id="updBtn">Mettre à jour</button></div>
+<header><img src="logo.png" alt="Logo M2M"><div><b>M2M – Musulman(e)s de Meudon</b><small>Application des adhérents et bénéficiaires</small></div></header>
+<main>
+
+<section id="home" class="on">
+  <div class="card">
+    <h2>Horaires de prière</h2>
+    <small class="m" id="src">Source : Centre Musulman de Clamart (MAWAQIT)</small>
+    <div class="pt" id="pt" style="margin-top:10px"></div>
+    <small class="m" id="ptdate"></small>
+    <a class="btn l" href="https://mawaqit.net/fr/mon-domicile-clamart-tv" target="_blank" rel="noopener">Ouvrir MAWAQIT (référence)</a>
+  </div>
+  <div class="card">
+    <h2>Nous rejoindre</h2>
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScTrTaS3nuxaLDtArAqDBiTIY20giBxfJ0IpMZ-XXJFzG0L2w/viewform" target="_blank" rel="noopener">Adhérer (gratuit) / groupe WhatsApp</a>
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSftDlr-0xYNRuu2zcd65e6YXlyKoI5mgEoMa9U4FbazW8i1BA/viewform" target="_blank" rel="noopener">Devenir bénévole</a>
+    <a class="btn o" href="https://pay.sumup.com/b2c/Q65O3I0I" target="_blank" rel="noopener">Faire un don</a>
+  </div>
+  <div class="card">
+    <h2>Suivre M2M</h2>
+    <a class="btn l" href="https://m2m-meudon.fr/index.php/actualites/" target="_blank" rel="noopener">Actualités du site</a>
+    <a class="btn l" href="https://www.facebook.com/share/168wRVbdU3/" target="_blank" rel="noopener">Page Facebook</a>
+  </div>
+</section>
+
+<section id="aide">
+  <div class="card">
+    <h2>Demande d’aide (colis, kits scolaires…)</h2>
+    <p>M2M aide toute personne en situation de besoin, sans condition religieuse. Voici les documents à rassembler pour constituer votre dossier. Cochez ceux que vous avez déjà : la liste reste sur votre téléphone.</p>
+    <small class="m">Vos données ne sont accessibles qu’au Bureau et aux référents action sociale (RGPD).</small>
+  </div>
+  <div class="card">
+    <h2>Documents à fournir</h2>
+    <div id="docs"></div>
+    <p><b>Selon votre situation seulement :</b><br><small class="m">justificatifs de charges importantes · jugement ou ordonnance de pension alimentaire et sommes versées/perçues · facture, relance ou échéancier en cas de dette</small></p>
+  </div>
+  <div class="card">
+    <h2>Comment nous les transmettre ?</h2>
+    <p>Au choix : <b>apportez-les (ou leur photocopie) à la permanence</b>, ou envoyez des photos nettes de vos documents par e-mail ou WhatsApp.</p>
+    <a class="btn" href="mailto:corresp.m2m@gmail.com?subject=Dossier%20b%C3%A9n%C3%A9ficiaire%20M2M">Envoyer par e-mail<br><small>corresp.m2m@gmail.com</small></a>
+    <a class="btn" href="https://wa.me/33744255913" target="_blank" rel="noopener">Envoyer par WhatsApp<br><small>07 44 25 59 13</small></a>
+    <a class="btn l" href="tel:+33744255913">Appeler M2M</a>
+    <a class="btn l" id="formlink" href="#" style="display:none" target="_blank" rel="noopener">Remplir le formulaire bénéficiaire</a>
+  </div>
+  <div class="card"><button class="btn l" id="wipe">Effacer ma liste sur cet appareil</button></div>
+</section>
+
+<section id="infos">
+  <div class="card">
+    <h2>Contact</h2>
+    <p>1 Square Bugeaud, 92360 Meudon-la-Forêt<br>
+    <a href="tel:+33744255913">07 44 25 59 13</a><br>
+    <a href="mailto:corresp.m2m@gmail.com">corresp.m2m@gmail.com</a></p>
+    <a class="btn l" href="https://m2m-meudon.fr/index.php/politique-confidentialite/" target="_blank" rel="noopener">Politique de confidentialité</a>
+    <a class="btn l" href="https://m2m-meudon.fr" target="_blank" rel="noopener">Site m2m-meudon.fr</a>
+  </div>
+  <div class="card"><small class="m">Version <span id="ver"></span></small></div>
+</section>
+</main>
+
+<nav>
+  <button data-t="home" class="on">Accueil</button>
+  <button data-t="aide">Demande d’aide</button>
+  <button data-t="infos">Infos</button>
+</nav>
+
+<script>
+const VERSION="1.0.1";
+document.getElementById('ver').textContent=VERSION;
+// Lien du formulaire bénéficiaire (à renseigner quand il existe)
+const FORM_BENEF="";
+if(FORM_BENEF){const a=document.getElementById('formlink');a.href=FORM_BENEF;a.style.display='block'}
+
+// Navigation
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');document.getElementById(b.dataset.t).classList.add('on');scrollTo(0,0)});
+
+// Horaires (horaires.json, mis à jour automatiquement côté GitHub)
+const NOMS={fajr:'Fajr',chourouk:'Chourouk',dhuhr:'Dhuhr',asr:'Asr',maghrib:'Maghrib',isha:'Isha',jumua1:'Joumou’a 1',jumua2:'Joumou’a 2'};
+fetch('horaires.json',{cache:'no-cache'}).then(r=>r.json()).then(d=>{
+  const pt=document.getElementById('pt');
+  pt.innerHTML=Object.keys(NOMS).filter(k=>d[k]).map(k=>`<div><span>${NOMS[k]}</span><b>${d[k]}</b></div>`).join('');
+  document.getElementById('ptdate').textContent='Mis à jour le '+d.maj+'. MAWAQIT reste la référence.';
+}).catch(()=>{document.getElementById('pt').textContent='Horaires indisponibles hors ligne.'});
+
+// Liste des pièces (cases cochées gardées en local sur le téléphone)
+const PIECES=[
+ ['id','Pièce d’identité','CNI, passeport ou document officiel'],
+ ['sej','Situation administrative en France','Titre de séjour / récépissé, si pertinent'],
+ ['qf','Attestation de quotient familial CAF','Depuis l’appli CAF : « Mes documents »'],
+ ['caf','Attestation de paiement CAF (moins de 3 mois)','Depuis l’appli CAF, avec toutes les prestations'],
+ ['imp','Avis d’imposition ou de non-imposition','Dernier avis'],
+ ['dom','Justificatif de domicile',''],
+ ['fam','Livret de famille / composition du foyer',''],
+ ['pro','Justificatif de situation professionnelle',''],
+ ['res','Justificatifs de ressources','']
+];
+let state={};try{state=JSON.parse(localStorage.getItem('m2m_docs')||'{}')}catch(e){}
+const box=document.getElementById('docs');
+box.innerHTML=PIECES.map(([k,t,h])=>`<label class="ck"><input type="checkbox" data-k="${k}" ${state[k]?'checked':''}><span><b>${t}</b><div class="f">${h}</div></span></label>`).join('');
+box.querySelectorAll('[data-k]').forEach(c=>c.onchange=()=>{state[c.dataset.k]=c.checked;try{localStorage.setItem('m2m_docs',JSON.stringify(state))}catch(e){}});
+document.getElementById('wipe').onclick=()=>{
+  if(confirm('Effacer votre liste sur cet appareil ?')){localStorage.removeItem('m2m_docs');location.reload()}};
+
+// Mise à jour : bandeau quand une nouvelle version est prête
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    const show=w=>{const u=document.getElementById('upd');u.style.display='block';
+      document.getElementById('updBtn').onclick=()=>w.postMessage('SKIP_WAITING')};
+    if(reg.waiting&&navigator.serviceWorker.controller)show(reg.waiting);
+    reg.addEventListener('updatefound',()=>{const n=reg.installing;
+      n.addEventListener('statechange',()=>{if(n.state==='installed'&&navigator.serviceWorker.controller)show(n)})});
+    setInterval(()=>reg.update(),30*60*1000);
+  });
+  let r=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!r){r=true;location.reload()}});
+}
+</script>
+</body>
+</html>
