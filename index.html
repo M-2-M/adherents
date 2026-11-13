@@ -168,7 +168,7 @@ nav button.on{color:#fff;box-shadow:inset 0 -3px 0 #e6c27a}
 <div id="rg"><div><h2>Bienvenue</h2><p>Cette application ne vous suit pas et ne collecte rien automatiquement.</p><p>Si vous déposez un dossier dans l’Espace bénéficiaire, vos informations et documents ne sont accessibles qu’au <b>Bureau</b> et aux <b>référents action sociale</b> de M2M. Votre accord vous sera demandé avant tout envoi.</p><button class="btn" id="rgok">J’ai compris</button></div></div>
 <script src="config.js"></script>
 <script>
-const APP_VERSION="6";   // à changer aussi dans version.json
+const APP_VERSION="7";   // à changer aussi dans version.json
 document.getElementById('ver').textContent=APP_VERSION;document.getElementById('vv').textContent=APP_VERSION;
 const go=t=>document.querySelector('nav [data-t="'+t+'"]').click();
 try{if(!localStorage.getItem('m2m_info'))document.getElementById('rg').style.display='flex'}catch(e){}
@@ -271,15 +271,15 @@ async function prep(f){
 async function collect(root){const o=[];for(const i of root.querySelectorAll('[data-f]'))for(const f of i.files){const p=await prep(f);p.label=i.dataset.f;o.push(p)}return o}
 // Champs du dossier : [clé, libellé, type, obligatoire, options]
 const FIELDS=[
- ['nom','Nom','text',1],['prenom','Prénom','text',1],['naissance','Date de naissance','date',1],
+ ['civilite','Civilité','select',1,['Monsieur','Madame']],['nom','Nom','text',1],['prenom','Prénom','text',1],['naissance','Date de naissance','date',1],
  ['adresse','Adresse complète','text',1],['tel','Téléphone','tel',1],['email','E-mail','email',0],
  ['sitfam','Situation familiale','select',1,['Célibataire','Marié(e)','Divorcé(e)','Veuf(ve)','Famille monoparentale']],
  ['orientation','Comment avez-vous connu M2M ?','select',0,['Mosquée','CCAS / mairie','Bouche-à-oreille','Réseaux sociaux','Autre']],
  ['autreStructure','Autre structure qui suit la famille (CCAS, Secours Catholique, Croix-Rouge…)','text',0],
  ['nbPers','Nombre de personnes dans le foyer','number',1],['nbEnf','Dont enfants à charge','number',1],
  ['foyer','Composition du foyer : une personne par ligne (prénom, lien, âge, besoin utile : couches, lait infantile, scolarité…)','textarea',1],
- ['pro','Situation professionnelle du demandeur','select',1,['Salarié','Indépendant','Demandeur d’emploi','Retraité','Sans activité','Autre']],
- ['logement','Logement','select',1,['Locataire','Propriétaire','Hébergé']],
+ ['pro','Situation professionnelle du demandeur','select',1,['Salarié','Indépendant','Demandeur d’emploi','Étudiant','Retraité','Sans activité','Autre']],
+ ['logement','Logement','select',1,['Locataire (parc privé)','Locataire (logement social)','Propriétaire','Hébergé à titre gratuit (famille, amis)','Hébergé avec participation / sous-location','Hébergement d’urgence / foyer / hôtel social','Sans logement stable']],
  ['loyer','Loyer restant à charge (€/mois)','number',0],
  ['ressources','Total des ressources mensuelles du foyer (€)','number',1],
  ['charges','Total des charges principales (€/mois)','number',0],
@@ -293,6 +293,9 @@ $('f_fields').innerHTML=FIELDS.map(([id,l,t,r,o])=>{
   return lab+i}).join('');
 const docInputs=()=>PIECES.map(([k,t])=>`<label class="l">${t} <small class="m">${k==='sej'?'(si pertinent)':'(à fournir)'}</small></label><input type="file" data-f="${k}" accept="image/*,application/pdf" multiple>`).join('');
 $('f_docs').innerHTML=docInputs();$('s_docs').innerHTML=docInputs();
+// bouton « Retirer » à côté de chaque pièce choisie (en cas d'erreur de fichier)
+function addClear(root){root.querySelectorAll('input[data-f]').forEach(i=>{const b=document.createElement('button');b.type='button';b.textContent='✕ Retirer';b.style.cssText='display:none;margin:0 0 0 8px;padding:4px 10px;border:1px solid #b00020;color:#b00020;background:#fff;border-radius:8px;font-size:.85em;cursor:pointer';i.after(b);i.addEventListener('change',()=>{b.style.display=i.files.length?'inline-block':'none'});b.onclick=()=>{i.value='';b.style.display='none'}})}
+addClear($('f_docs'));addClear($('s_docs'));
 function res(el,r,intro){el.className=r.manquant?'wa':'ok';el.innerHTML=intro+(r.manquant?'<br>⚠ Il manque encore : '+esc(r.manquant)+'. Vous pourrez l’ajouter dans « Suivre / compléter mon dossier ».':'<br>✅ Votre dossier est complet.')}
 $('f_send').onclick=async()=>{
   const m=$('f_msg'),d={action:'submit',pwd:pwd(),website:$('f_web').value},miss=[];
@@ -344,7 +347,7 @@ function drawB(){
 }
 function det(c){
   const x=ROWS.find(r=>r.code===c);if(!x)return;
-  $('b_det').innerHTML=`<div class="card"><h2>${esc(x.code)} – ${esc(x.nom)} ${esc(x.prenom)}</h2>
+  $('b_det').innerHTML=`<div class="card"><h2>${esc(x.code)} – ${esc(x.civilite)} ${esc(x.nom)} ${esc(x.prenom)}</h2>
   <p>📞 <a href="tel:${esc(x.tel)}">${esc(x.tel)}</a>${x.email?' · '+esc(x.email):''}<br>📍 ${esc(x.adresse)}<br>👨‍👩‍👧 ${esc(x.nbPers)} pers. dont ${esc(x.nbEnf)} enfant(s) · ressources ${esc(x.ressources)} €<br><b>Remise :</b> ${esc(x.mode)}<br><b>Besoins :</b> ${esc(x.situation)}<br><b>Foyer :</b> ${esc(x.foyer)}</p>
   <p><b>Pièces reçues :</b> ${esc(x.recues)||'aucune'}<br><b>Manque :</b> ${esc(x.manquant)||'rien'}</p>
   <a class="btn l" href="${esc(x.drive)}" target="_blank" rel="noopener">Ouvrir le dossier Drive</a>
