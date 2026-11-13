@@ -56,6 +56,12 @@ nav button.on{color:#fff;box-shadow:inset 0 -3px 0 #e6c27a}
 <main>
 
 <section id="home" class="on">
+  <div class="card" id="inst" style="display:none;background:#fff8e6;border-color:#e6c27a">
+    <b>📲 Installer l’application sur votre téléphone</b>
+    <p id="inst_txt" style="margin:6px 0"></p>
+    <button class="btn" id="inst_go" style="display:none">Installer l’application</button>
+    <button class="btn l" id="inst_no">Plus tard</button>
+  </div>
   <div class="card">
     <h2>Horaires de prière</h2>
     <small class="m">Source : Centre Musulman de Clamart (MAWAQIT)</small>
@@ -168,7 +174,7 @@ nav button.on{color:#fff;box-shadow:inset 0 -3px 0 #e6c27a}
 <div id="rg"><div><h2>Bienvenue</h2><p>Cette application ne vous suit pas et ne collecte rien automatiquement.</p><p>Si vous déposez un dossier dans l’Espace bénéficiaire, vos informations et documents ne sont accessibles qu’au <b>Bureau</b> et aux <b>référents action sociale</b> de M2M. Votre accord vous sera demandé avant tout envoi.</p><button class="btn" id="rgok">J’ai compris</button></div></div>
 <script src="config.js"></script>
 <script>
-const APP_VERSION="8";   // à changer aussi dans version.json
+const APP_VERSION="9";   // à changer aussi dans version.json
 document.getElementById('ver').textContent=APP_VERSION;document.getElementById('vv').textContent=APP_VERSION;
 const go=t=>document.querySelector('nav [data-t="'+t+'"]').click();
 try{if(!localStorage.getItem('m2m_info'))document.getElementById('rg').style.display='flex'}catch(e){}
@@ -369,6 +375,26 @@ if(SCRIPT_URL&&pwd())loadB().then(ok=>{if(ok)bureauUI(true)});
 
 // Mise à jour : on compare la version de cette page à version.json (bandeau en haut)
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+// ----- Proposition d'installation sur l'écran d'accueil (mobile) -----
+(function(){
+  const box=$('inst'),txt=$('inst_txt'),bt=$('inst_go'),no=$('inst_no');
+  const ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),mobile=ios||/android/i.test(ua);
+  const inapp=/FBAN|FBAV|Instagram|TikTok|WhatsApp|Snapchat|Line\//i.test(ua);
+  const installed=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  let hid=false;try{hid=localStorage.getItem('m2m_inst')==='1'}catch(e){}
+  if(installed||!mobile||hid)return;
+  const show=()=>{box.style.display='block'};
+  no.onclick=()=>{box.style.display='none';try{localStorage.setItem('m2m_inst','1')}catch(e){}};
+  let dp=null;
+  if(ios){
+    txt.innerHTML=inapp?'Ouvrez cette page dans <b>Safari</b> (menu « … » > « Ouvrir dans le navigateur »), puis touchez le bouton <b>Partager</b> et « Sur l’écran d’accueil ».':'Touchez le bouton <b>Partager</b> (carré avec une flèche vers le haut) de Safari, puis <b>« Sur l’écran d’accueil »</b>. Vous retrouverez M2M comme une application.';
+    show();return;
+  }
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;txt.textContent='Ajoutez M2M à votre écran d’accueil pour l’ouvrir comme une application.';bt.style.display='block';show()});
+  bt.onclick=async()=>{if(!dp)return;dp.prompt();try{await dp.userChoice}catch(e){}dp=null;box.style.display='none'};
+  window.addEventListener('appinstalled',()=>{box.style.display='none'});
+  setTimeout(()=>{if(!dp&&box.style.display==='none'){txt.innerHTML=inapp?'Ouvrez cette page dans <b>Chrome</b>, puis menu <b>⋮</b> > « Installer l’application » ou « Ajouter à l’écran d’accueil ».':'Menu <b>⋮</b> du navigateur, puis <b>« Installer l’application »</b> ou « Ajouter à l’écran d’accueil ».';show()}},2500);
+})();
 async function chkVer(){
   try{const j=await (await fetch('version.json?'+Date.now(),{cache:'no-store'})).json();
     if(String(j.version)!==APP_VERSION){
